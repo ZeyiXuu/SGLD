@@ -1,14 +1,67 @@
-\documentclass{article}
-\usepackage{graphicx} % Required for inserting images
-
-\title{SGLD}
-\author{zeyix1 }
-\date{March 2025}
+\documentclass[10pt]{amsart}
+\input{./mysetting.tex}
+%\newcommand{\nm}[1]{\left\lVert {#1} \right\rVert}
+%\newcommand{\proxi}[0]{ {\bf prox}}
+\newcommand{\gf}{\nabla f}
 
 \begin{document}
-
+\title{Stochastic Gradient Langevin Dynamics for Bayesian Learning}
+\author{Zeyi Xu}\date{\today}
+\begin{abstract}
+Stochastic Gradient Langevin Dynamics (SGLD) is a sampling method proposed in the paper \textit{Bayesian Learning via Stochastic Gradient Langevin Dynamics} \cite{10.5555/3104482.3104568}. It stands at the intersection of stochastic optimization and Langevin-proposed MCMC methods. In this report, we summarize the mathematical foundations of the method, implement the method and test its performance on various learning tasks.
+\end{abstract}
 \maketitle
 
+\tableofcontents
 \section{Introduction}
+The main points of the report are listed as follows:
+\begin{itemize}
+    \item The paper considers the Bayesian learning problem, that is, given probability model, do the Maximum A Posterior estimate from sample data.
+    \item In the paper, the authors focus on the Bayesian modeling with parametric models.
+    \item The authors derived the SGLD algorithm by combining Stochastic gradient method with Langevin dynamics.
+    \item In essence, the problem is about sampling from a known distribution. Besides all the standard MCMC methods, Hamiltonian Monte Carlo (HMC) is of interest as an accelerating sampling method. \cite{chen2014stochasticgradienthamiltonianmonte} develops a way to incorporate stochastic gradient into HMC method. Recent years, generative models have caught wide attention for their expressive power and scaling property \cite{Bond_Taylor_2022}.
+    \item In this report, we used SGLD to solve 2 Bayesian learning problems. One is the toy example of Gaussian mixtures, the other one is the logistic regression problem.
+\end{itemize}
+The rest of the report is organized as follows. In section 2, we briefly go over the problem setting, and elaborate the method as a combination of stochastic gradient method and Langevin dynamics. In section 3, we implement the method and report the results of numerical experiments.
 
+\section{Method}
+We consider the $n$-dimensional Bayesian learning problem with a large scale dataset. Let $\theta\in\mathbb{R}^n$ be a set of model parameters, $\{x_i\}_{i=1}^N$ data points. The problem is to compute the MAP estimation 
+\begin{equation}
+    p(\theta|x)\propto p(\theta)\prod_{i=1}^N p(x_i|\theta)
+\end{equation}
+using prior distribution $p(\cdot)$ and likelihood function $p(x|\theta)$.
+Equivalently, maximize the logarithm of posterior distribution density
+\begin{equation} \label{logmap}
+    \max_{\theta} f(\theta):=\log p(\theta) + \sum_{i=1}^N \log p(x_i|\theta).
+\end{equation}
+For this optimization problem, a classic method is to do gradient ascent,
+\begin{equation}
+    \theta_{k+1}=\theta_k + \alpha_k \gf(\theta_k).
+\end{equation}
+The drawback of this method is that the model replies deterministically on the training data $\{x_i\}$, and it might overfit and could not generalize to new data. To circumvent this situation, consider adding a stochastic term into the update
+\begin{equation}\label{langevin_discrete}
+    \theta_{k+1}=\theta_k + \alpha_k \gf(\theta_k) + \sqrt{2\alpha_k}\xi_k,
+\end{equation}
+where $\xi_k\sim N(0,I_n)$ is a $n$-dimensional standard normal vector. It can be seen as the $\alpha_k$-discretization of the following Langevin-dynamics
+\begin{equation} \label{langevin}
+    d\theta_t = -\nabla U(\theta_t)dt+\sqrt{2}dB_t,
+\end{equation}
+where $U$ is the potential, $U(\theta)=-f(\theta)$. In continuous-time dynamics, \eqref{langevin} converges to its stationary distribution 
+\begin{equation}
+    \pi(\theta)\propto e^{-U(\theta)}.
+\end{equation}
+In discrete time, such property will not naturally hold, but it can be fit into the framework of Rosenbluth-Hastings by adding a probability of acceptance, making it a typical MCMC algorithm with the proposal in the form of \eqref{langevin_discrete}. This is called the Metropolis adjusted Langevin algorithm (MALA). 
+
+Though provably faster than the na\"ive proposals such as Gaussian, MALA needs to evaluate the gradients of all current sample points each step. This becomes computationally expensive when (1) the sample size is extremely large (2) the gradient is hard to evaluate.
+
+Stochastic Gradient provides a way to overcome this issue. Instead of evaluating the full gradient, it only computes gradients for a mini-batch of samples $\{x_{ki}\}_{i=1}^m$, and replace the gradient term by the partial gradient on these points. Combining it with \eqref{logmap}, \eqref{langevin_discrete}, we get the so-called Stoachastic Gradient Langevin Dynamics 
+\begin{equation}\label{SGLD}
+    \theta_{k+1}=\theta_k + \alpha_k\left[\log p(\theta_k)+\frac{N}{n}\sum_{i=1}^n \log p(x_{ki}|\theta_k)\right]+\sqrt{2\alpha_k}\xi_k    
+\end{equation}
+where $\xi_k\sim N(0,I_n)$.
+
+\section{Numerical Experiments}
+
+\bibliographystyle{abbrv}
+\bibliography{reference}
 \end{document}
