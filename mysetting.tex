@@ -1,0 +1,111 @@
+\usepackage{amsmath, amssymb, amsthm,graphicx}
+\usepackage[font=small,labelfont=md,textfont=it]{caption}
+\usepackage{floatrow,float}
+\usepackage[titletoc, title]{appendix}
+\usepackage[colorlinks,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage[hyperpageref]{backref}
+\usepackage{longtable}
+\usepackage{pgfplots}
+\usepackage{diagbox}
+\usepackage{booktabs,makecell,multirow}
+\usepackage[capitalise, nosort]{cleveref}
+\usepackage{cases,color}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{amsmath,bm}
+%\usepackage{geometry}
+
+\usepackage{tcolorbox}
+\usepackage{array}
+\renewcommand\arraystretch{1.5}
+
+\newtheorem{algo}{Algorithm}
+%\geometry{left = 3cm,right=3cm,top =3cm,bottom = 3.5cm }
+
+\DeclareMathOperator{\D}{D}
+\DeclareMathOperator{\I}{I}
+
+\crefname{equation}{}{}
+\crefname{lem}{Lemma}{Lemmas}
+\crefname{thm}{Theorem}{Theorems}
+
+\newcommand{\dd}{\,{\rm d}}
+\newcommand{\R}{\,{\mathbb R}}
+\newcommand{\bs}{\boldsymbol}
+\newcommand{\dual}[1]{\left\langle {#1} \right\rangle}
+\newcommand{\proxi}[0]{ {\bf prox}}
+\newcommand{\J}[0]{ {\bf J}}
+\newcommand{\dom}[0]{ {\bf dom\,}}
+\newcommand{\argmin}[0]{ {\mathrm {argmin}\,}}
+\newcommand{\inner}[1]{\left({#1} \right)}
+\newcommand{\jmp}[1]{{[\![ {#1} ]\!]}}
+\newcommand{\nm}[1]{\left\lVert {#1} \right\rVert}
+\newcommand{\snm}[1]{\left\lvert {#1} \right\rvert}
+\newcommand{\ssnm}[1]
+{
+  \left\vert\kern-0.25ex
+  \left\vert\kern-0.25ex
+  \left\vert
+  {#1}
+  \right\vert\kern-0.25ex
+  \right\vert\kern-0.25ex
+  \right\vert
+}
+\newcommand{\lsnm}[1]{\snm{#1}^{\text{\tiny L}}}
+\newcommand{\rsnm}[1]{\snm{#1}^{\text{\tiny R}}}
+
+\renewcommand{\algorithmicrequire}{ \textbf{Input:}} %Use Input in the format of Algorithm
+\renewcommand{\algorithmicensure}{ \textbf{Output:}} %UseOutput in the format of Algorithm
+
+\makeatletter
+\def\spher@harm#1{%
+  \vbox{\hbox{%
+    \offinterlineskip
+    \valign{&\hb@xt@2\p@{\hss$##$\hss}\vskip.2ex\cr#1\crcr}%
+  }\vskip-.36ex}%
+}
+\def\gshone{\spher@harm{.}}
+\def\gshtwo{\spher@harm{.&.}}
+\def\gshthree{\spher@harm{.&.&.}}
+\let\gsh\spher@harm
+\makeatother
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{exercise}[theorem]{Exercise}
+\newtheorem{question}[theorem]{Question}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{alg}[theorem]{Algorithm}
+
+%\newtheorem{algor}{Algorithm}
+% \newtheorem{alg}{algorithm}
+% %\newtheorem{alg}[theorem]{Algorithm}
+% \newtheorem{coro}{corollary}[section]
+% \newtheorem{prop}{proposition}[section]
+% \newtheorem{Def}{definition}[section]
+% \newtheorem{assum}{assumption}
+% \newtheorem{lem}{lemma}[section]
+% \newtheorem{rem}{remark}[section]
+% \newtheorem{thm}{theorem}[section]
+% \newtheorem{example}{example}[section]
+% \newtheorem{exercise}{exercise}
+
+\newcommand{\LH}[1]{\textcolor{blue}{#1}}
+\newcommand{\LC}[1]{\textcolor{red}{#1}}
+\newcommand{\JW}[1]{\textcolor{cyan}{#1}}
+  \newcounter{mnote}
+\setcounter{mnote}{0}
+\newcommand{\mnote}[1]{\addtocounter{mnote}{1}
+	\ensuremath{{}^{\bullet\arabic{mnote}}}
+	\marginpar{\footnotesize\em\color{red}\ensuremath{\bullet\arabic{mnote}}#1}}
+\let\oldmarginpar\marginpar
+\renewcommand\marginpar[1]{\-\oldmarginpar[\raggedleft\footnotesize #1]%
+	{\raggedright\footnotesize #1}}
+
+%\renewcommand\qedsymbol{\hfill\ensuremath{\blacksquare}}
+
+\makeatletter\def\@captype{table}\makeatother

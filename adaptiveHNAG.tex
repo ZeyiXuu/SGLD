@@ -1,0 +1,397 @@
+\documentclass[10pt]{amsart}
+\input{./mysetting.tex}
+%\newcommand{\nm}[1]{\left\lVert {#1} \right\rVert}
+%\newcommand{\proxi}[0]{ {\bf prox}}
+
+\begin{document}
+\title{Adaptive Accelerated Gradient Methods for Convex Optimization}
+%\author{Long Chen}\date{\today}
+\begin{abstract}
+Only consider $\mu = 0$. 
+\end{abstract}
+\maketitle
+
+\tableofcontents
+
+%We focus on the case $\mu = 0$. Even for $\mu > 0$, we do not know $\mu$ or have a good guess on it. 
+
+We discuss adaptive choice of parameters used in accelerated gradient methods. 
+
+\section{Adaptive Accelerated Gradient Methods}
+\subsection{Flow and strong Lyapunov property}
+We write the first-order system
+\begin{equation}\label{eq:Hagf-intro}
+	\left\{
+	\begin{aligned}
+		x' = {}&y-x-\beta\nabla f(x),\\
+		y'={}&x - y -\frac{1}{\lambda}\nabla f(x).
+	\end{aligned}
+	\right.
+\end{equation}
+%Will discuss choice of parameters 
+%With adaptive choice of parameters $\beta$ and $\lambda$. 
+Denote by $\bs z=(x, y)^{\intercal}$. Introduce the Lyapunov function
+$$
+\mathcal E(\bs z, \lambda):=f(x)-f(x^{\star})+\frac{\lambda}{2}\nm{y-x^{\star}}^2,
+$$
+%\end{equation}
+and denote by $\mathcal G(\bs z)$ the right hand side of \eqref{eq:Hagf-intro},
+%\[
+%\mathcal G(\bs z, \lambda)
+%%=
+%%\begin{pmatrix}
+%% \mathcal G^x\\
+%% \mathcal G^y\\
+%% \mathcal G^{\lambda}
+%%\end{pmatrix}
+%:=
+%\begin{pmatrix}
+%	y-x - \beta \nabla f(x)\\
+%	\displaystyle \frac{\mu}{\lambda}(x-v)-\frac{1}{\lambda}\nabla f(x)\\
+%	\mu-\lambda
+%\end{pmatrix}.
+%\]
+which then becomes $\bs z' = \mathcal G(\bs z)$. In the notation $\nabla \mathcal E$, we consider $\lambda$ as a fixed parameter and take derivative with respect to $\bs z$. 
+\begin{lemma}We have the identity
+ \begin{equation}
+ \begin{aligned}
+	-\nabla \mathcal E(\bs z, \lambda) \cdot \mathcal G(\bs z, \lambda) = {}&
+\mathcal E(\bs z, \lambda)+ \beta \nm{\nabla f(x)}_*^2  +\frac{\lambda}{2}\nm{y-x}^2 +  D_f(x^*, x) \\
+&-\frac{\lambda}{2}\nm{x - x^{\star}}^2.	
+\end{aligned}
+\end{equation}
+\end{lemma}
+\begin{proof}
+A direct computation gives 
+\begin{equation}\label{eq:A-HNAG}
+\begin{split}
+	&-\nabla \mathcal E(\bs z, \lambda) \cdot \mathcal G(\bs z, \lambda) 
+= 
+\begin{pmatrix}
+\nabla f(x)\\
+ \lambda (y-x^{\star})
+\end{pmatrix}
+\begin{pmatrix}
+(x-x^{\star}) - (y - x^{\star})+\beta\nabla f(x)\\ 
+(y - x^{\star})- (x-x^{\star}) +\frac{1}{\lambda}\nabla f(x)\\ 
+\end{pmatrix}
+	\\
+	={}& \dual{\nabla f(x),x-x^{\star}} + \beta\nm{\nabla f(x)}_*^2+ \lambda\nm{y-x^{\star}}^2 -\lambda (y-x^{\star}, x - x^{\star})\\
+=	{}&  \mathcal E(\bs z, \lambda)+ \beta \nm{\nabla f(x)}_*^2  +  D_f(x^*, x)  +\frac{\lambda}{2}\nm{y-x}^2 -\frac{\lambda}{2}\nm{x - x^{\star}}^2.	
+\end{split}
+\end{equation}
+\end{proof}
+
+We now discuss how to cancel the negative term $- \frac{\lambda}{2} \|x-x^{\star}\|^2$ and 
+then we will get the strong Lyapunov property
+$$
+-\nabla \mathcal E(\bs z, \lambda) \cdot \mathcal G(\bs z, \lambda) \geq \mathcal E(\bs z, \lambda).
+$$
+Consequently exponential stability follows.
+
+When $f$ is $\lambda$-strongly convex, using the convexity bound  $D_f(x^*, x)\geq \frac{\lambda}{2} \|x-x^{\star}\|^2$, we can cancel the negative term and verify the strong Lyapunov property. Equivalently when $f$ is $\mu$-strongly convex, we take $\lambda =\mu$. 
+%we have the last three terms
+%$$
+%D_f(x^*, x) + \frac{\lambda}{2}\nm{y-x^{\star}}^2-\lambda (y-x^{\star}, x - x^{\star})\geq \frac{\lambda}{2}\|x-y\|^2.
+%$$
+
+%Hence $\mathcal E$ is a strong Lyapunov function, if we can control the cross term $-\lambda (y-x^{\star}, x - x^{\star})$. 
+%we can use the co-convexity 
+%$$
+%D_f(x^*, x)\geq \frac{1}{2L}\| \nabla f(x)\|_*^2,
+%$$
+%which can contribute more to the extra gradient norm component. 
+%
+%First by the Cauchy-Schwarz inequality,
+%$$
+%\lambda (y-x^{\star}, x - x^{\star})\leq \frac{\lambda}{2}\nm{y-x^{\star}}^2 + \frac{\lambda}{2}\nm{x-x^{\star}}^2. 
+%$$
+%To cancel the negative term $-\frac{\lambda}{2}\nm{x - x^{\star}}^2$, 
+When $f$ is weakly convex only or $\mu$ is hard to estimate, 
+we can choose $\lambda$ such that
+\begin{equation}
+\frac{\lambda}{2}\left (\nm{x-x^{\star}}^2 - \nm{x-y}^2\right )\leq \beta\| \nabla f(x)\|_*^2. 
+\end{equation}
+As $x^{\star}$ is unknown, we assume $\nm{x-x^{\star}}^2 \leq R_0^2$. 
+% and assume we can set  $\lambda$ such that
+%\begin{equation}
+%\lambda \leq (2\beta + \frac{1}{L}) \frac{\| \nabla f(x)\|_*^2}{R_0^2}. 
+%\end{equation}
+%\LC{formulate as a theorem}
+
+\subsection{Accelerated gradient method}\label{sec:HNAG-GS-2}
+Let us apply the Gauss-Seidel type discretization to \eqref{eq:Hagf-intro} and obtain
+%A Gauss-Seidel scheme without extra gradient step is considered below
+\begin{equation}\label{eq:ex-HNAG}
+	\left\{
+	\begin{aligned}
+		x_{k+1}-x_{k}={}& \alpha_k \left (y_{k}-x_{k+1}\right ) - \alpha_k \beta_k\nabla f(x_{k}),\\
+ y_{k+1}-y_{k}={}&
+		-\frac{\alpha_k}{\lambda_k}\nabla f(x_{k+1}) + \alpha_k \left ( x_{k+1} - y_{k+1}\right ).
+	\end{aligned}
+	\right.
+\end{equation}
+where $\alpha_k>0$ is the time step size. Denote by $L_k = (\alpha_k\beta_k)^{-1}$. 
+
+\begin{lemma}We have the identity
+ 	\begin{equation*}
+		%	\label{diff-Lk}
+		\begin{split}
+&\mathcal E(\bs z_{k+1}; \lambda_{k}) - \mathcal E(\bs z_k; \lambda_k) 
+			= {} -\alpha_k\mathcal E(\bs z_{k+1}; \lambda_{k})  - \alpha_k D_f(x^{\star}, x_{k+1})\\
+			&  +\frac{1}{2}\left ( \frac{\alpha_k^2}{\lambda_k}  - \frac{1}{L_k}\right )\nm{\nabla f(x_{k+1})}_*^2			\\
+			& +\frac{1}{2L_k}\| \nabla f(x_{k+1}) - \nabla f(x_k) \|^2 - D_f(x_{k}, x_{k+1})\\
+			& -\frac{1}{2L_k}\nm{\nabla f(x_k)}_*^2+ \frac{\alpha_k\lambda_k}{2}\left (\nm{x_{k+1}-x^{\star}}^2 - (1+\alpha_k)\nm{x_{k+1}-y_{k+1}}^2\right ).
+		\end{split}
+	\end{equation*}
+\end{lemma}
+\begin{proof}
+Treat $\lambda_k$ as a fixed parameter. We expand the difference
+\begin{equation}\label{eq:Elambda}
+\mathcal E(\bs z_{k+1}; \lambda_{k}) - \mathcal E(\bs z_k; \lambda_k) = \langle \nabla \mathcal E(\bs z_{k+1}; \lambda_{k}), \bs z_{k+1} - \bs z_k \rangle - D_{\mathcal E}(\bs z_k, \bs z_{k+1};\lambda_k),
+\end{equation}
+where the negative term $- D_{\mathcal E}(\bs z_k, \bs z_{k+1};\lambda_k)$ is exapnded as
+$$
+- D_f(x_k, x_{k+1}) - \frac{\lambda_k}{2}\| y_{k} - y_{k+1}\|^2.
+$$
+
+Using the identity~\eqref{eq:A-HNAG} in the continuous level, we have
+$$
+\begin{aligned}
+&\langle \nabla \mathcal E(\bs z_{k+1}; \lambda_{k}), \alpha_k \mathcal G(\bs z_{k+1}, \lambda_k) \rangle = \alpha_k \mathcal E(\bs z_{k+1}, \lambda_k)\\
+&  - \frac{1}{L_k} \nm{\nabla f(x_{k+1})}_*^2  - \alpha_k D_f(x^*, x_{k+1}) + \frac{\alpha_k\lambda_k} {2}\left (\nm{x_{k+1}-x^{\star}}^2 - \nm{x_{k+1}-y_{k+1}}^2\right ).	
+\end{aligned}
+$$
+
+The difference between the scheme and the implicit Euler method is
+$$
+\bs z_{k+1} - \bs z_k - \alpha_k \mathcal G(\bs z_{k+1}, \lambda_k) = \alpha_k 
+\begin{pmatrix}
+ y_k - y_{k+1} + \beta_k (\nabla f(x_{k+1}) - \nabla f(x_{k}))\\
+0
+\end{pmatrix}.
+$$
+which will bring more terms
+	\begin{align*}
+&		\dual{\nabla_x \mathcal E(\bs z_{k+1}, \lambda_{k}), \bs z_{k+1} - \bs z_k - \alpha_k \mathcal G(\bs z_{k+1}, \lambda_k)} \\
+		&= \frac{1}{L_k} \left ( \nabla f(x_{k+1}) , \nabla f(x_{k+1}) - \nabla f(x_k)\right )+\alpha_k \dual{\nabla f(x_{k+1}), y_k - y_{k+1}}.
+	\end{align*}
+	We use the identity of squares for the cross term of gradients
+	\begin{align*}
+		&\frac{1}{L_k}( \nabla f(x_{k+1}) , \nabla f(x_{k+1}) - \nabla f(x_k)) \\
+		= & - \frac{1}{2L_k}\| \nabla f(x_{k})\|_*^2
+		+ \frac{1}{2L_k}\| \nabla f(x_{k+1})\|_*^2 + \frac{1}{2L_k}\| \nabla f(x_{k+1}) - \nabla f(x_k) \|_*^2.
+	\end{align*}
+As expected, this cross term brings more positive squares but also contribute a negative one.
+
+On the second term, we write as
+$$
+\begin{aligned}
+&\alpha_k \dual{\nabla f(x_{k+1}), y_k - y_{k+1}} ={} (\frac{\alpha_k}{\sqrt{\lambda_k}}\nabla f(x_{k+1}), \sqrt{\lambda_k}(y_k - y_{k+1}))\\
+={}& \frac{\alpha_k^2}{2\lambda_k} \| \nabla f(x_{k+1})\|_*^2 + \frac{\lambda_k}{2}\nm{y_k - y_{k+1}}^2 - \frac{1}{2}\nm{ \frac{\alpha_k}{\sqrt{\lambda_k}}\nabla f(x_{k+1}) - \sqrt{\lambda_k} (y_{k} - y_{k+1})}^2\\
+={}& \frac{\alpha_k^2}{2\lambda_k} \| \nabla f(x_{k+1})\|_*^2 + \frac{\lambda_k}{2}\nm{y_k - y_{k+1}}^2 - \frac{1}{2}\alpha_k^2\lambda_k\nm{ x_{k+1} - y_{k+1}}^2.
+\end{aligned}
+$$
+Combining altogether, we get the desired identity. 
+\end{proof}
+
+\subsection{Adaptive choice of parameters}
+Based on the identity of the difference of Lyapunov function, we propose the following adaptive procedure. 
+\begin{enumerate}
+\item For given $\lambda_k, L_k$, set 
+\begin{equation}\label{eq:alphak}
+\alpha_k = \sqrt{\frac{\lambda_k}{L_k}}. 
+\end{equation}
+
+\item Verify the inequality
+\begin{equation}\label{eq:Lk}
+\frac{1}{2L_k}\| \nabla f(x_{k+1}) - \nabla f(x_k) \|^2 \leq D_f(x_{k}, x_{k+1}).
+\end{equation}
+If not hold, increase $L_k$ by a factor. Notice that \eqref{eq:Lk} always holds with constant $L$ by the co-convexity of $f$. Once $L_k$ is updated, $\alpha_k$ should also updated by \eqref{eq:alphak}.
+
+\item Verify the inequality
+\begin{equation}\label{eq:lambdak}
+ \frac{\alpha_k\lambda_k}{2}\left (R_k^2 - (1+\alpha_k)\nm{x_{k+1}-y_{k+1}}^2\right ) \leq \frac{1}{2L_k}\nm{\nabla f(x_k)}_*^2.
+\end{equation}
+If not hold, decrease $\lambda_k$ by a factor and repeat (1)-(3). As $L_k \leq L$ and $\alpha_k = \sqrt{\lambda_k/L_k}$, \eqref{eq:lambdak} will hold if $\lambda_k$ is sufficiently small.  
+
+The hyper-parameter $R_k^2$ can be chosen as follows. First set a reasonable $R_0$. Then decay like $R_k = R_0/k$. It is sub-linear decay in the $\mu = 0$ case.
+\end{enumerate}
+
+\begin{theorem}
+	\label{lem:conv-ex1-ode-NAG}
+	For scheme \eqref{eq:ex-HNAG} with parameters satisfying \eqref{eq:alphak}, \eqref{eq:Lk}, and \eqref{eq:lambdak},  we have the linear convergence
+	\begin{equation}\label{eq:conv1-ex1-ode-NAG}
+\mathcal E(x_{k+1}, y_{k+1}, \lambda_{k+1}) \leq \frac{1}{1+ \sqrt{\lambda_k/L_k}} \mathcal E(x_{k}, y_{k}, \lambda_{k}). 
+	\end{equation}
+	where $\mathcal E_k = \mathcal E(\bs z_k, \lambda_k)
+	= {}f(x_k)-f(x^{\star}) + \frac{\lambda_k}{2} \nm{y_k-x^{\star}}^2.$
+\end{theorem}
+
+\end{document}
+
+%We start from an initial guess $(x_0, y_0)$ and set 
+%$$
+%\lambda_0 = \delta \|\nabla f(x_0)\|_*^{4/3}
+%$$
+%with a sufficiently small $\delta\in (0,1]$ s.t. $\delta \leq 1/(L^{1/3}R_0^{4/3})$.
+%
+%For $k=0, 1, \ldots$, given the current iterate $\bs z_k=(x_k, y_k, \lambda_k)$, one compute $x_{k+1}$ and $y_{k+1}$ successively from the first and the second equations. Notice that there might be no monotonicity on the gradient norm of iterations. We update the parameter $\lambda_{k+1}$ by
+%$$
+%\lambda_{k+1} = \lambda_k \times \min \left \{ \frac{\| \nabla f(x_{k+1}) \|^{4/3}}{\| \nabla f(x_{k}) \|^{4/3}}, 1 \right \}
+%$$
+%
+%
+%\LC{formulate as a lemma}
+%Then it is easy to show for all $k$
+%$$
+%\lambda_k\leq \frac{\| \nabla f(x_k)\|^{4/3}}{L^{1/3}R_0^{4/3}}, \quad \lambda_{k+1}\leq \lambda_k.
+%$$
+%
+%We have three parameters $(\alpha_k, \beta_k, \lambda_k)$ in \eqref{eq:ex-HNAG} and will set
+%\begin{equation}\label{eq:ab}
+%\alpha_k = \sqrt{\frac{\lambda_k}{L}},  \quad \alpha_k \beta_k = \frac{1}{L}.
+%\end{equation}
+%Note that a slight larger step size is used in \eqref{eq:ab}. 
+
+%Although there are two gradient evaluations in the $k$-th iteration of \eqref{eq:ex-HNAG}, the second one $\nabla f(x_{k+1})$ can be reused in the $k+1$-th iteration for updating $x_{k+2}$. 
+
+\newpage
+
+\begin{proof}
+As $\mathcal E(\bs z_{k+1}; \lambda_{k+1})\leq \mathcal E(\bs z_{k+1}; \lambda_{k})$, w
+We cannot use the proof in the continuous level as in the algorithm, $x_{k+1}$ is unknown when using $\lambda_k$. 
+
+	
+In $-D_{\mathcal E}(\bs z_k, \bs z_{k+1};\lambda_k)$, we have a negative term $-\frac{\lambda_k}{2}\| y_k-y_{k+1}\|^2$ and can be used to bound the cross term $\alpha_k\dual{\nabla f(x_{k+1}), y_k - y_{k+1}}$
+	\begin{equation*}
+		%	\label{eq:df-diff-vk}
+		\begin{split}
+			\alpha_k \| \nabla f(x_{k+1})\|_*\| y_k - y_{k+1}\|\leqslant {}&
+			\frac{\alpha_k^2}{2\lambda_k} \| \nabla f(x_{k+1})\|_*^2 
+			+ \frac{\lambda_k}{2}\| y_k - y_{k+1}\|^2.
+		\end{split}
+	\end{equation*}
+The benefit of HNAG is we have $- \alpha_k\beta_k \nm{\nabla f(x_{k+1})}_*^2$ from the strong Lyapunov property. 
+
+ 
+	
+	Adding all together, we get 
+	\begin{equation*}
+		%	\label{diff-Lk}
+		\begin{split}
+\mathcal E(\bs z_{k+1}; \lambda_{k}) - \mathcal E(\bs z_k; \lambda_k) 
+			\leqslant {}& -\alpha_k\mathcal E(\bs z_{k+1}; \lambda_{k})\\
+			& -\frac{\alpha_k\beta_k}{2}\nm{\nabla f(x_k)}_*^2+ \frac{\alpha_k\lambda_k}{2}\nm{x_{k+1}-x^{\star}}^2  \\
+			& \quad +\frac{1}{2}\left ( \frac{\alpha_k^2}{\lambda_k}  - \alpha_k\beta_k - \frac{\alpha_k}{L}\right )\nm{\nabla f(x_{k+1})}_*^2			\\
+			& \qquad+\frac{1}{2}\left ( \alpha_k\beta_k - \frac{1}{L}\right )\| \nabla f(x_{k+1}) - \nabla f(x_k) \|^2.
+		\end{split}
+	\end{equation*}
+By our choice of parameters, the last term is vanished as $\alpha_k\beta_k = 1/L$ and the third term is negative. The step size can be slightly larger like
+$$
+\frac{\alpha_k^2}{\lambda_k} = \frac{1+\alpha_k}{L}.
+$$
+Then we chose $\lambda_k$ s.t.
+$$
+\frac{\alpha_k\lambda_k}{2}\nm{x_{k+1}-x^{\star}}^2 \leq \frac{1}{2L}\nm{\nabla f(x_k)}_*^2.
+$$
+Using the formulae of $\alpha_k$ and $\nm{x_{k+1}-x^{\star}}^2\leq R_0^2$, we can simplify the choice to
+\begin{equation}\label{eq:upplambda}
+\lambda_k\leq \frac{\| \nabla f(x_k)\|^{4/3}}{L^{1/3}R_0^{4/3}}.
+\end{equation}
+
+The step size 
+$$
+\alpha_k = \sqrt{\frac{\lambda_k}{L}} \leq \left (\frac{\| \nabla f(x_k)\|}{LR_0}\right )^{4/3}.
+$$
+\end{proof}	
+So the convergence might be better as $\lambda_k$ is larger compare to $\|\nabla f(x_k)\|^2$. 
+
+\subsection{Adaptive Lipschitz constant}
+There are three parameters to be determined
+$$
+\alpha_k, L_k, \gamma_k, \quad \text{with }L_k = 1/\alpha_k\beta_k.
+$$
+
+A simple constraint is from the 
+\begin{equation}
+\left ( \frac{\alpha_k^2}{\lambda_k}  - \alpha_k\beta_k\right )\nm{\nabla f(x_{k+1})}_*^2,
+\end{equation}
+which gives relation 
+$$
+\alpha_k = \sqrt{\frac{\lambda_k}{L_k}} = L_k^{-4/3} d_k.
+$$
+
+
+To control $\nm{x_{k+1}-x^{\star}}^2$, we use
+\begin{equation}
+- \alpha_k D_f(x^{\star}, x_{k+1}) -\frac{1}{2L_k}\nm{\nabla f(x_k)}_*^2+ \frac{\alpha_k\lambda_k}{2}\nm{x_{k+1}-x^{\star}}^2 
+\end{equation}
+which put constraints
+\begin{equation}\label{eq:lambdaLk}
+\lambda_k \leq \frac{\| \nabla f(x_k)\|^{4/3}}{L_k^{1/3}R_0^{4/3}}.
+\end{equation}
+without considering the first term. We choose $\lambda_k$ by the last formulae
+$$
+\lambda_k = L_k^{-1/3} d_k, \quad d_k = \frac{\| \nabla f(x_k)\|^{4/3}}{R_0^{4/3}}.
+$$
+
+
+In the first step of updating $x_{k+1}$: 
+$$
+		\frac{x_{k+1}-x_{k}}{\alpha_k}= y_{k}-x_{k+1}-\beta_k\nabla f(x_{k})
+$$
+As $\lambda_k$ is fixed at the $k$-th iteration, 
+$$
+x_{k+1} = x_k+ \frac{1}{1+\alpha_k(L_k)} \left (\alpha_k(L_k) (y_k - x_k) - \frac{1}{L_k}\nabla f(x_k) \right )
+$$
+is a function of $L_k$. We want $L_k$ is adaptive and as small as possible to satisfy 
+\begin{equation}\label{eq:Lk}
+\frac{1}{2L_k}\| \nabla f(x_{k+1}) - \nabla f(x_k) \|_*^2 \leq D_f(x_k, x_{k+1}).
+\end{equation}
+It will hold for $L_k = L$ where $L$ is the global Lipschitz constants but can hold with much smaller $L_k$. 
+
+Locally,  
+$$
+D_f(x_k, x_{k+1}) = \|x_k - x_{k+1}\|_{H(\xi)}^2, \quad \| \nabla f(x_{k+1}) - \nabla f(x_k) \|_*^2 = \|x_k - x_{k+1}\|_{H^2(\eta)}^2.
+$$  
+Roughly speaking, $L_k$ is the largest eigenvalue in the direction of $x_k - x_{k+1}$. If the direction corresponds to a small eigenvector, $L_k$ is small. We can use the ratio of this quantity to define a new $L_k$ and then use it to compute a new $x_{k+1}$.  
+
+Notice that different $L_k$ values will affect not only the step size but also the direction for updating $x_{k+1}$. The search direction is a combination of $\nabla f(x_k)$ and $y_k - x_k$. Therefore, line search cannot be applied.  
+
+The monitor or merit function for $L$ is  
+$$
+m(L) = L D_f(x_k, x_{k+1}(L)) - \| \nabla f(x_{k+1}(L)) - \nabla f(x_k) \|_*^2.
+$$  
+The local problem is  
+\begin{equation}\label{eq:localproblem}
+L_k = \min\{ L \mid m(L) > 0, L > 0\}.
+\end{equation}  
+
+It is better to fix $\lambda_k$ when solving the local problem \eqref{eq:localproblem}. Increasing $\lambda_k$ will increase the Lyapunov function and destroy its decreasing property. Therefore, we fix $\lambda_k$ when updating $(x_{k+1}, y_{k+1})$. However, if $L_k$ increases, we can update $\lambda_k$ because the bound becomes smaller. This process is quite tricky.  
+
+After that, we update $\lambda_{k+1}$ using the ratio:  
+\begin{equation}\label{eq:adaptive}
+\lambda_{k+1} = \lambda_k \times \min \left \{ \frac{\| \nabla f(x_{k+1}) \|^{4/3}}{\| \nabla f(x_k) \|^{4/3}} \frac{L_{k-1}^{1/3}}{L_k^{1/3}}, 1 \right \}.
+\end{equation}  
+This formulation ensures that even if $\| \nabla f(x_{k+1}) \|$ becomes smaller, $\lambda_k$ can remain unchanged, as the local Lipschitz constant might increase.  
+
+One more nonlinear update is applied after computing $(x_{k+1}, y_{k+1})$: we decide whether to accept $x_{k+1}$ by comparing the function values $f(x_k)$ and $f(x_{k+1})$. This rule cannot be used in the first step, as $(x, y)$ are coupled in updating $y_{k+1}$ through the second equation.  
+
+\begin{remark}\rm  
+For the strongly convex case, where $D_f(x^{\star}, x_{k+1}) \geq \frac{\mu}{2} \|x_{k+1} - x^{\star}\|^2$, we can refine the solution to satisfy  
+$$
+\sqrt{\lambda}(\lambda - \mu) \leq \frac{\|\nabla f(x_k)\|^2}{\sqrt{L_k}}.  
+$$  
+The solution is approximated by \LC{not quite correct.}  
+$$
+\lambda = \mu + \mu^{1/4}\|\nabla f(x_k)\|.  
+$$  
+If $\|\nabla f(x_k)\|^2 \geq \mu$, this approximation provides a better linear convergence rate. However, when the gradient is small, we may need to add a small adjustment to $\lambda$.  
+\end{remark}  
+
+
+
+\bibliographystyle{abbrv}
+\bibliography{/Users/longchen1/Dropbox/Math/biblib/LongLibraryZotero}
+\end{document}
