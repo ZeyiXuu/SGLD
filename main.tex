@@ -20,7 +20,7 @@ The main points of the report are listed as follows:
     \item In the paper, the authors focus on the Bayesian modeling with parametric models.
     \item The authors derived the SGLD algorithm by combining Stochastic gradient method with Langevin dynamics.
     \item In essence, the problem is about sampling from a known distribution. Besides all the standard MCMC methods, Hamiltonian Monte Carlo (HMC) is of interest as an accelerating sampling method. \cite{chen2014stochasticgradienthamiltonianmonte} develops a way to incorporate stochastic gradient into HMC method. Recent years, generative models have caught wide attention for their expressive power and scaling property \cite{Bond_Taylor_2022}.
-    \item In this report, we used SGLD to solve 2 Bayesian learning problems. One is the toy example of Gaussian mixtures, the other one is the logistic regression problem.
+    \item In this report, we used SGLD to solve 2 Bayesian learning problems. One is the linear regression problem, the other one is the logistic regression problem.
 \end{itemize}
 The rest of the report is organized as follows. In section 2, we briefly go over the problem setting, and elaborate the method as a combination of stochastic gradient method and Langevin dynamics. In section 3, we implement the method and report the results of numerical experiments.
 
@@ -61,6 +61,7 @@ Stochastic Gradient provides a way to overcome this issue. Instead of evaluating
 where $\xi_k\sim N(0,I_n)$.
 
 \section{Numerical Experiments}
+In this section, we perform 2 numerical experiments to validify SGLD in Bayesian learning tasks. All the necessary code for this section can be found at GitHub repository \href{https://github.com/ZeyiXuu/SGLD.git}{https://github.com/ZeyiXuu/SGLD.git}. As the original paper does not come with code, the code above is adapted from the existing third-party code on SGLD: \href{https://github.com/LouisBouvier/BML_Stochastic_Langevin_Dynamics.git}{https://github.com/LouisBouvier/BML\_Stochastic\_Langevin\_Dynamics.git} and \href{https://github.com/JavierAntoran/Bayesian-Neural-Networks.git}{https://github.com/JavierAntoran/Bayesian-Neural-Networks.git}.
 \subsection{Bayesian Linear Regression using SGLD}
 
 In this experiment, we apply Stochastic Gradient Langevin Dynamics to perform Bayesian Linear Regression with a Laplace prior of scale \( b=1 \). For now, we fix the variance of the Gaussian likelihood to \( \sigma^2=1 \). We also compare Stochastic Gradient Langevin Dynamics to other sampling methods to test its efficiency, particularly its speed.
@@ -91,9 +92,9 @@ and \( y \) the vector of labels, we can write a subgradient of the log-posterio
 \]
 
 To test validity of the SGLD method, We apply it to synthetic data. Let $y=0.02x^3+x^2+0.3x$ be the objective relation. Let $x$ be $250$ points randomly chosen from $[-5,5]$, and corresponding $y$ be computed from the desired relation. Apply Mini Batch SGLD method with $\texttt{batch\_size}=5$ for $5000$ iterations. The resulting parameters form a well-trained linear regression model. Use the model to do prediction, the results are quite close to the ground truth (Fig. \ref{fig:lr}).
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
-    \includegraphics[width=0.5\linewidth]{graph/SGLD_LR.npg.png}
+    \includegraphics[width=0.5\linewidth]{graph/SGLD_LR.png}
     \caption{The performance of SGLD on linear regression tasks}
     \label{fig:lr}
 \end{figure}
@@ -108,6 +109,20 @@ $$
 \partial_{\beta} \log p(\beta | X, y) = \sum_{i=1}^N y_i \cdot x_i \left( 1 - \sigma(y_i \cdot \beta^{\top}x_i) \right) - \text{sign}(\beta)
 $$
 To test validity of the SGLD method, We apply it to synthetic data. We generate two clusters containing $1500$ sample points centered respectively at $(-2,2)$ and $(2,-2)$ with $\texttt{std}=1.3$. Apply Mini Batch SGLD method with $\texttt{batch\_size}=5$ for $5000$ iterations. The resulting parameters form a well-trained Logistic regression model. Use the model to do prediction, we gained a high accuracy for point separation (Fig. \ref{fig:logr}(a)). Fig \ref{fig:logr}(b) is the contour map of the predicted probability given by the regression model. When a point deviates from the straight line $y=-x$, its predicted value will rise or drop quickly to $1$ or $0$, showing that the model will give it a clear and correct classification.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\linewidth]{graph/SGLD_LogR.png}
+    \caption{Classification results of the Bayesian Logistic Regression model}
+    \label{fig:logr}
+\end{figure}
+
+\section{Conclusion}
+In this project, we summarize the mathematical aspects of the Stochastic Gradient Langevin Dynamics (SGLD) as a combination of Stochastic Gradient Descent with Langevin Dynamics. We implement the algorithm and test it on simple regression tasks with synthetic data. The results show the validity of this method. Future directions of this project are:
+\begin{itemize}
+    \item[(1)] comparing the efficiency of SGLD with other more naive sampling methods;
+    \item[(2)] recognizing the accelerated methods to SGLD, such as SAGA-LD and SVRG-LD, and developing more efficient Bayesian learning methods;
+    \item[(3)] using acclerated optimization methods from math community to further accelerate Langevin-based sampling methods.
+\end{itemize}
 
 \bibliographystyle{abbrv}
 \bibliography{reference}
