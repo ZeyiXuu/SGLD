@@ -61,6 +61,37 @@ Stochastic Gradient provides a way to overcome this issue. Instead of evaluating
 where $\xi_k\sim N(0,I_n)$.
 
 \section{Numerical Experiments}
+\subsection{Bayesian Linear Regression using SGLD}
+
+In this experiment, we apply Stochastic Gradient Langevin Dynamics to perform Bayesian Linear Regression with a Laplace prior of scale \( b=1 \). For now, we fix the variance of the Gaussian likelihood to \( \sigma^2=1 \). We also compare Stochastic Gradient Langevin Dynamics to other sampling methods to test its efficiency, particularly its speed.
+
+The model is as follows:
+\[
+p(\beta) \sim \mathcal{L}(0, 1), \quad \text{i.e.} \quad p(\beta) \propto \exp(-\|\beta\|_1),
+\]
+For all \( i \in \{1, \dots, N\} \), 
+\[
+y_i \sim \mathcal{N}(x_i^{\top}\beta, \sigma^2), \quad \text{i.i.d.}
+\]
+Thus, the log posterior is:
+\[
+\log p(\beta | X, y) \propto - \sum_{i=1}^N (x_i^{\top}\beta - y_i)^2 - \|\beta \|_1 = - \|X\, \beta - y\|_2^2 - \|\beta \|_1
+\]
+Using the fact that a subgradient of the log-prior is \( \partial_{\beta} \log p(\beta) = - \mathrm{sign}(\beta) \) and letting \( X \) represent the data matrix, i.e.
+\[
+X = \begin{pmatrix}
+x_1\\
+\vdots\\
+x_n
+\end{pmatrix} \in \mathbb{R}^{n \times d}
+\]
+and \( y \) the vector of labels, we can write a subgradient of the log-posterior as:
+\[
+\partial_{\beta} \log p(\beta | X, y) = - X^{\top}X \, \beta + X^{\top}y - \mathrm{sign}(\beta).
+\]
+
+To test validity of the SGLD method, We apply it to synthetic data. Let $y=0.02x^3+x^2+0.3x$ be the objective relation. Let $x$ be $250$ points randomly chosen from $[-5,5]$, and corresponding $y$ be computed from the desired relation. Apply Mini Batch SGLD method with $\texttt{batch\_size}=5$ for $5000$ iterations. The resulting parameters form a well-trained linear regression model. Use the model to do prediction, the results are quite close to the ground truth. This shows 
+
 
 \bibliographystyle{abbrv}
 \bibliography{reference}
